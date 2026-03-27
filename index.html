@@ -256,10 +256,10 @@ class DrawShape {
   }
   update() { this.age++; this.pulse += 0.05; }
   draw(ctx) {}
-  drawFolded(ctx, mode, foldLines) {
-    const drawn = this._foldDraw(ctx, mode, foldLines, 0);
+  drawFolded(ctx, mode, allFolds) {
+    const drawn = this._foldDraw(ctx, mode, allFolds, 0);
   }
-  _foldDraw(ctx, mode, folds, depth) {
+  _foldDraw(ctx, mode, allFolds, depth) {
     if (depth > 4) return;
     ctx.save();
     ctx.translate(panX, panY);
