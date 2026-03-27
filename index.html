@@ -207,7 +207,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 <div id="stats">
   FRACTAL FOLD<br>
-  <span id="foldStat">0 folds</span><br>
+  <span id="foldStat">0 foldLines</span><br>
   <span id="shapeStat">0 shapes</span>
 </div>
 
@@ -297,8 +297,8 @@ class LineShape extends DrawShape {
     ctx.beginPath(); ctx.arc(this.x, this.y, 3, 0, Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(this.x2, this.y2, 3, 0, Math.PI*2); ctx.fill();
   }
-  drawFolded(ctx, mode, folds) {
-    const instances = getFoldInstances(mode, folds, this.x, this.y, this.x2, this.y2);
+  drawFolded(ctx, mode, foldLines) {
+    const instances = getFoldInstances(mode, foldLines, this.x, this.y, this.x2, this.y2);
     instances.forEach(([ax,ay,ax2,ay2]) => {
       ctx.save();
       ctx.translate(panX, panY);
@@ -348,8 +348,8 @@ class CircleShape extends DrawShape {
     ctx.fillStyle = `hsl(${this.hue},100%,80%)`;
     ctx.fill();
   }
-  drawFolded(ctx, mode, folds) {
-    const instances = getCircleInstances(mode, folds, this.x, this.y, this.r);
+  drawFolded(ctx, mode, foldLines) {
+    const instances = getCircleInstances(mode, foldLines, this.x, this.y, this.r);
     instances.forEach(([ax, ay, ar]) => {
       ctx.save();
       ctx.translate(panX, panY);
@@ -396,8 +396,8 @@ class TriangleShape extends DrawShape {
     ctx.fillStyle = `hsla(${this.hue},100%,60%,0.1)`;
     ctx.fill();
   }
-  drawFolded(ctx, mode, folds) {
-    const instances = getTriInstances(mode, folds, this.x,this.y, this.x2,this.y2, this.x3,this.y3);
+  drawFolded(ctx, mode, foldLines) {
+    const instances = getTriInstances(mode, foldLines, this.x,this.y, this.x2,this.y2, this.x3,this.y3);
     instances.forEach(([ax,ay,ax2,ay2,ax3,ay3]) => {
       ctx.save();
       ctx.translate(panX, panY);
@@ -433,8 +433,8 @@ class RectShape extends DrawShape {
     ctx.fillStyle = `hsla(${this.hue},100%,60%,0.08)`;
     ctx.fillRect(this.x, this.y, this.w, this.h);
   }
-  drawFolded(ctx, mode, folds) {
-    const instances = getRectInstances(mode, folds, this.x,this.y,this.w,this.h);
+  drawFolded(ctx, mode, foldLines) {
+    const instances = getRectInstances(mode, foldLines, this.x,this.y,this.w,this.h);
     instances.forEach(([ax,ay,aw,ah]) => {
       ctx.save();
       ctx.translate(panX, panY);
@@ -473,8 +473,8 @@ class ScatterShape extends DrawShape {
       ctx.fill();
     });
   }
-  drawFolded(ctx, mode, folds) {
-    const instances = getFoldInstances(mode, folds, this.x, this.y, this.x, this.y);
+  drawFolded(ctx, mode, foldLines) {
+    const instances = getFoldInstances(mode, foldLines, this.x, this.y, this.x, this.y);
     const pts = this.pts;
     instances.forEach(([ax,ay]) => {
       ctx.save();
@@ -505,10 +505,10 @@ function reflectPoint(px, py, x1, y1, x2, y2) {
   return {x: rx, y: ry};
 }
 
-function getLineInstances(folds, x, y, x2, y2) {
-  if (!folds.length) return [[x,y,x2,y2]];
+function getLineInstances(foldLines, x, y, x2, y2) {
+  if (!foldLines.length) return [[x,y,x2,y2]];
   let instances = [[x,y,x2,y2]];
-  folds.forEach(f => {
+  foldLines.forEach(f => {
     const next = [];
     instances.forEach(([ax,ay,ax2,ay2]) => {
       next.push([ax,ay,ax2,ay2]);
@@ -521,11 +521,11 @@ function getLineInstances(folds, x, y, x2, y2) {
   return instances;
 }
 
-function getCircleInstances(mode, folds, x, y, r) {
-  if (!folds.length && mode !== 'radial' && mode !== 'kaleido') return [[x,y,r]];
+function getCircleInstances(mode, foldLines, x, y, r) {
+  if (!foldLines.length && mode !== 'radial' && mode !== 'kaleido') return [[x,y,r]];
   let result = [[x,y,r]];
-  if (mode === 'mirror' && folds.length) {
-    folds.forEach(f => {
+  if (mode === 'mirror' && foldLines.length) {
+    foldLines.forEach(f => {
       const next = [];
       result.forEach(([cx,cy,cr]) => {
         next.push([cx,cy,cr]);
@@ -579,11 +579,11 @@ function getCircleInstances(mode, folds, x, y, r) {
   return result;
 }
 
-function getTriInstances(mode, folds, x,y, x2,y2, x3,y3) {
-  if (!folds.length && mode !== 'radial' && mode !== 'kaleido') return [[x,y,x2,y2,x3,y3]];
+function getTriInstances(mode, foldLines, x,y, x2,y2, x3,y3) {
+  if (!foldLines.length && mode !== 'radial' && mode !== 'kaleido') return [[x,y,x2,y2,x3,y3]];
   let result = [[x,y,x2,y2,x3,y3]];
-  if (mode === 'mirror' && folds.length) {
-    folds.forEach(f => {
+  if (mode === 'mirror' && foldLines.length) {
+    foldLines.forEach(f => {
       const next = [];
       result.forEach(([ax,ay,ax2,ay2,ax3,ay3]) => {
         next.push([ax,ay,ax2,ay2,ax3,ay3]);
@@ -641,11 +641,11 @@ function getTriInstances(mode, folds, x,y, x2,y2, x3,y3) {
   return result;
 }
 
-function getRectInstances(mode, folds, x,y,w,h) {
-  if (!folds.length && mode !== 'radial') return [[x,y,w,h]];
+function getRectInstances(mode, foldLines, x,y,w,h) {
+  if (!foldLines.length && mode !== 'radial') return [[x,y,w,h]];
   let result = [[x,y,w,h]];
-  if (mode === 'mirror' && folds.length) {
-    folds.forEach(f => {
+  if (mode === 'mirror' && foldLines.length) {
+    foldLines.forEach(f => {
       const next = [];
       result.forEach(([ax,ay,aw,ah]) => {
         next.push([ax,ay,aw,ah]);
@@ -669,11 +669,11 @@ function getRectInstances(mode, folds, x,y,w,h) {
   return result;
 }
 
-function getFoldInstances(mode, folds, x, y, x2, y2) {
-  if (!folds.length && mode !== 'radial' && mode !== 'kaleido' && mode !== 'crystal') return [[x,y,x2,y2]];
+function getFoldInstances(mode, foldLines, x, y, x2, y2) {
+  if (!foldLines.length && mode !== 'radial' && mode !== 'kaleido' && mode !== 'crystal') return [[x,y,x2,y2]];
   let result = [[x,y,x2,y2]];
-  if (mode === 'mirror' && folds.length) {
-    result = getLineInstances(folds, x, y, x2, y2);
+  if (mode === 'mirror' && foldLines.length) {
+    result = getLineInstances(foldLines, x, y, x2, y2);
   }
   if (mode === 'radial') {
     const n = radialCount;
@@ -807,7 +807,7 @@ function drawBackground() {
   }
   
   // Fold lines preview
-  folds.forEach((f, i) => {
+  foldLines.forEach((f, i) => {
     ctx.strokeStyle = i === hoveredFoldIdx 
       ? 'rgba(0,255,136,0.7)' 
       : 'rgba(212,168,83,0.35)';
@@ -837,7 +837,7 @@ function render() {
   // Draw shapes with fold mirroring
   shapes.forEach(s => {
     ctx.shadowBlur = 0;
-    s.drawFolded(ctx, mode, folds);
+    s.drawFolded(ctx, mode, foldLines);
   });
   
   // Active drawing preview
@@ -862,10 +862,10 @@ function updateStats() {
   const foldCountEl = document.getElementById('foldStat');
   const shapeStatEl = document.getElementById('shapeStat');
   const foldCount = document.getElementById('fold-count');
-  if (foldCountEl) foldCountEl.textContent = `${folds.length} fold${folds.length !== 1 ? 's' : ''}`;
+  if (foldCountEl) foldCountEl.textContent = `${foldLines.length} fold${foldLines.length !== 1 ? 's' : ''}`;
   if (shapeStatEl) shapeStatEl.textContent = `${shapes.length} shape${shapes.length !== 1 ? 's' : ''}`;
   if (foldCount) {
-    foldCount.textContent = mode === 'mirror' ? `${folds.length} FOLD${folds.length !== 1 ? 'S' : ''} ACTIVE` : mode.toUpperCase() + ' ×' + radialCount;
+    foldCount.textContent = mode === 'mirror' ? `${foldLines.length} FOLD${foldLines.length !== 1 ? 'S' : ''} ACTIVE` : mode.toUpperCase() + ' ×' + radialCount;
   }
 }
 
@@ -946,7 +946,7 @@ canvas.addEventListener('mousemove', e => {
   // Check fold line hover
   hoveredFoldIdx = -1;
   if (mode === 'mirror') {
-    folds.forEach((f, i) => {
+    foldLines.forEach((f, i) => {
       const dist = pointToSegmentDist(w.x, w.y, f.x1, f.y1, f.x2, f.y2);
       if (dist < 10 / zoom) hoveredFoldIdx = i;
     });
@@ -1000,7 +1000,7 @@ canvas.addEventListener('contextmenu', e => {
   const w = screenToWorld(e.clientX, e.clientY);
   const len = 200;
   const angle = Math.random() * Math.PI;
-  folds.push({
+  foldLines.push({
     x1: w.x - Math.cos(angle) * len/2,
     y1: w.y - Math.sin(angle) * len/2,
     x2: w.x + Math.cos(angle) * len/2,
@@ -1019,7 +1019,7 @@ function pointToSegmentDist(px, py, x1,y1, x2,y2) {
 
 // ─── History ───
 function saveHistory() {
-  history.push({ shapes: JSON.parse(JSON.stringify(shapes)), folds: JSON.parse(JSON.stringify(folds)) });
+  history.push({ shapes: JSON.parse(JSON.stringify(shapes)), foldLines: JSON.parse(JSON.stringify(foldLines)) });
   if (history.length > 50) history.shift();
 }
 
@@ -1048,7 +1048,7 @@ document.querySelectorAll('[data-mode]').forEach(btn => {
     document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     mode = btn.dataset.mode;
-    folds = [];
+    foldLines = [];
     if (mode === 'radial' || mode === 'kaleido') {
       radialCount = parseInt(document.getElementById('radialN').value);
     }
@@ -1064,10 +1064,10 @@ document.querySelectorAll('[data-tool]').forEach(btn => {
 });
 
 document.getElementById('clearBtn').addEventListener('click', () => {
-  if (shapes.length || folds.length) {
+  if (shapes.length || foldLines.length) {
     saveHistory();
     shapes = [];
-    folds = [];
+    foldLines = [];
   }
 });
 
@@ -1075,7 +1075,7 @@ document.getElementById('undoBtn').addEventListener('click', () => {
   if (history.length) {
     const h = history.pop();
     shapes = h.shapes;
-    folds = h.folds;
+    foldLines = h.foldLines;
   }
 });
 
@@ -1117,7 +1117,7 @@ window.addEventListener('keydown', e => {
   }
   if (e.key === 'z' && !e.ctrlKey && history.length) {
     const h = history.pop();
-    shapes = h.shapes; folds = h.folds;
+    shapes = h.shapes; foldLines = h.foldLines;
   }
   if (e.key === 'Escape') {
     demoMode = false;
