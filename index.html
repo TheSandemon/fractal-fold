@@ -333,7 +333,7 @@ class CircleShape extends DrawShape {
   }
   update() { super.update(); }
   draw(ctx) {
-    const pulseR = this.r * (1 + 0.08 * Math.sin(this.pulse));
+    const pulseR = Math.max(0.1, this.r * (1 + 0.08 * Math.sin(this.pulse)));
     ctx.strokeStyle = `hsla(${this.hue},100%,65%,0.85)`;
     ctx.lineWidth = 2 + glowIntensity * 2;
     ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
@@ -355,7 +355,7 @@ class CircleShape extends DrawShape {
       ctx.translate(panX, panY);
       ctx.scale(zoom, zoom);
       ctx.translate(CX, CY);
-      const pulseR = ar * (1 + 0.08 * Math.sin(this.pulse));
+      const pulseR = Math.max(0.1, ar * (1 + 0.08 * Math.sin(this.pulse)));
       ctx.strokeStyle = `hsla(${this.hue},100%,65%,0.85)`;
       ctx.lineWidth = 2 + glowIntensity * 2;
       ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
