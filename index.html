@@ -1053,7 +1053,7 @@ function updateParticles() {
   particles.forEach(p => {
     p.x += p.vx; p.y += p.vy;
     p.vx *= 0.96; p.vy *= 0.96;
-    p.life -= p.decay;
+    p.life = Math.max(0, p.life - p.decay);
   });
 }
 
@@ -1063,7 +1063,7 @@ function drawParticles() {
     ctx.shadowColor = `hsl(${p.hue},100%,60%)`;
     ctx.shadowBlur = 8;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI*2);
+    ctx.arc(p.x, p.y, Math.max(0, p.r * p.life), 0, Math.PI*2);
     ctx.fill();
   });
 }
