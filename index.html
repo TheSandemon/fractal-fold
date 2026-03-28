@@ -1130,12 +1130,14 @@ function drawBackground() {
       ctx.arc(0, 0, r, 0, Math.PI*2);
       ctx.stroke();
     });
-    // Fractal grid
+    // Fractal guide grid
     if (mode === 'fractal') {
       ctx.strokeStyle = theme.foldLine.replace('0.35', '0.08');
       for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 4; j++) {
-          ctx.strokeRect(x * (0.4 + i * 0.3) - 20, y * (0.4 + j * 0.3) - 20, 40, 40);
+          const gx = (i - 1.5) * 80;
+          const gy = (j - 1.5) * 80;
+          ctx.strokeRect(gx - 20, gy - 20, 40, 40);
         }
       }
     }
